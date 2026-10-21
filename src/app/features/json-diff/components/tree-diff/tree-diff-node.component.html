@@ -1,0 +1,76 @@
+<div
+  class="row"
+  role="treeitem"
+  [attr.data-kind]="node().kind"
+  [attr.aria-level]="depth() + 1"
+  [attr.aria-expanded]="hasChildren() ? expanded() : null"
+  [attr.aria-selected]="active()"
+  [class.active]="active()"
+  [style.--depth]="depth()"
+>
+  @if (hasChildren()) {
+    <button
+      type="button"
+      class="toggle"
+      (click)="ctx.toggleNode(node().id)"
+      [attr.aria-expanded]="expanded()"
+      [attr.aria-label]="(expanded() ? 'Recolher ' : 'Expandir ') + node().label"
+    >
+      <svg lucideChevronRight></svg>
+    </button>
+  } @else {
+    <span class="toggle-spacer"></span>
+  }
+
+  <span class="marker" aria-hidden="true">{{ marker() }}</span>
+  <span class="key">{{ node().label }}</span>
+  <span class="colon">:</span>
+
+  @let v = view();
+  @if (v.value !== null) {
+    <span class="value">{{ v.value }}</span>
+  }
+  @if (v.oldValue !== null) {
+    <code class="old" [class.strike]="node().kind === 'modified'">{{ v.oldValue }}</code>
+  }
+  @if (v.oldValue !== null && v.newValue !== null) {
+    <span class="arrow">→</span>
+  }
+  @if (v.newValue !== null) {
+    <code class="new">{{ v.newValue }}</code>
+  }
+  @if (v.typeChange) {
+    <span class="hint">tipo: {{ v.typeChange }}</span>
+  }
+  @if (v.moved) {
+    <span class="hint">{{ v.moved }}</span>
+  }
+  @if (nestedChanges() > 0) {
+    <span class="nested"
+      >{{ nestedChanges() }} {{ nestedChanges() === 1 ? 'alteração' : 'alterações' }}</span
+    >
+  }
+
+  <button
+    type="button"
+    class="icon-btn locate"
+    (click)="ctx.locateNode(node())"
+    [title]="'Ver ' + (node().path || '(raiz)') + ' no editor'"
+  >
+    <svg lucideCrosshair></svg>
+    <span class="sr-only">Ver no editor</span>
+  </button>
+</div>
+
+@if (hasChildren() && expanded()) {
+  <div role="group">
+    @for (child of shownChildren(); track child.id) {
+      <app-tree-diff-node [node]="child" [depth]="depth() + 1" />
+    }
+    @if (hiddenChildren() > 0) {
+      <button type="button" class="more" [style.--depth]="depth() + 1" (click)="showMore()">
+        Mostrar mais {{ hiddenChildren() }} itens…
+      </button>
+    }
+  </div>
+}

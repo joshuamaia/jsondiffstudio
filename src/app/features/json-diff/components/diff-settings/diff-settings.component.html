@@ -1,0 +1,219 @@
+@if (open()) {
+  <div class="backdrop" (click)="closed.emit()" aria-hidden="true"></div>
+  <aside
+    class="drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="settings-title"
+    cdkTrapFocus
+    [cdkTrapFocusAutoCapture]="true"
+  >
+    <header class="drawer-header">
+      <h2 id="settings-title">Configurações</h2>
+      <button
+        type="button"
+        class="icon-btn"
+        (click)="closed.emit()"
+        aria-label="Fechar configurações"
+      >
+        <svg lucideX></svg>
+      </button>
+    </header>
+
+    <div class="drawer-body">
+      <section>
+        <h3>Aparência</h3>
+        <div class="segmented" role="radiogroup" aria-label="Tema">
+          <button
+            type="button"
+            role="radio"
+            [attr.aria-checked]="theme.theme() === 'dark'"
+            [class.selected]="theme.theme() === 'dark'"
+            (click)="theme.set('dark')"
+          >
+            <svg lucideMoon></svg> Escuro
+          </button>
+          <button
+            type="button"
+            role="radio"
+            [attr.aria-checked]="theme.theme() === 'light'"
+            [class.selected]="theme.theme() === 'light'"
+            (click)="theme.set('light')"
+          >
+            <svg lucideSun></svg> Claro
+          </button>
+        </div>
+      </section>
+
+      <section>
+        <h3>Formatação</h3>
+        <p class="label">Indentação</p>
+        <div class="segmented" role="radiogroup" aria-label="Indentação">
+          @for (size of [2, 4]; track size) {
+            <button
+              type="button"
+              role="radio"
+              [attr.aria-checked]="settings().indent === size"
+              [class.selected]="settings().indent === size"
+              (click)="store.setIndent($any(size))"
+            >
+              {{ size }} espaços
+            </button>
+          }
+        </div>
+        <label class="switch">
+          <input
+            type="checkbox"
+            [checked]="settings().autoFormatOnPaste"
+            (change)="settingsService.update({ autoFormatOnPaste: $any($event.target).checked })"
+          />
+          <span class="track"><span class="thumb"></span></span>
+          Pretty Print automático ao colar
+        </label>
+      </section>
+
+      <section>
+        <h3>Comparação de arrays</h3>
+        <div class="options">
+          <label class="radio">
+            <input
+              type="radio"
+              name="arrayMode"
+              [checked]="settings().arrayMode === 'index'"
+              (change)="setArrayMode('index')"
+            />
+            <span>
+              <strong>Por posição</strong>
+              <small>Compara elementos pelo índice: [0] com [0], [1] com [1]…</small>
+            </span>
+          </label>
+          <label class="radio">
+            <input
+              type="radio"
+              name="arrayMode"
+              [checked]="settings().arrayMode === 'key'"
+              (change)="setArrayMode('key')"
+            />
+            <span>
+              <strong>Por identificador</strong>
+              <small>Emparelha objetos por um campo; mudanças de ordem não são diferenças.</small>
+            </span>
+          </label>
+        </div>
+        <label class="field" [class.disabled]="settings().arrayMode !== 'key'">
+          <span class="label">Campo identificador</span>
+          <input
+            type="text"
+            [value]="settings().arrayKey"
+            (input)="setArrayKey($any($event.target).value)"
+            [disabled]="settings().arrayMode !== 'key'"
+            placeholder="id"
+            spellcheck="false"
+            list="array-key-suggestions"
+          />
+          <datalist id="array-key-suggestions">
+            @for (key of keySuggestions; track key) {
+              <option [value]="key"></option>
+            }
+          </datalist>
+        </label>
+      </section>
+
+      <section>
+        <h3>Ignorar propriedades</h3>
+        <p class="help">
+          Informe nomes (<code>updatedAt</code>) ou caminhos completos
+          (<code>meta.requestId</code>).
+        </p>
+        <form class="add-row" (submit)="$event.preventDefault(); addIgnoredKey()">
+          <input
+            type="text"
+            [value]="newIgnoredKey()"
+            (input)="newIgnoredKey.set($any($event.target).value)"
+            placeholder="Nome da propriedade"
+            aria-label="Propriedade a ignorar"
+            spellcheck="false"
+          />
+          <button type="submit" class="btn" [disabled]="!newIgnoredKey().trim()">
+            <svg lucidePlus></svg> Adicionar
+          </button>
+        </form>
+        @if (settings().ignoredKeys.length > 0) {
+          <ul class="tags">
+            @for (key of settings().ignoredKeys; track key) {
+              <li class="tag">
+                <code>{{ key }}</code>
+                <button
+                  type="button"
+                  (click)="settingsService.removeIgnoredKey(key)"
+                  [attr.aria-label]="'Parar de ignorar ' + key"
+                >
+                  <svg lucideX></svg>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+        @if (ignoredSuggestions().length > 0) {
+          <div class="suggestions">
+            <span class="label">Sugestões:</span>
+            @for (key of ignoredSuggestions(); track key) {
+              <button type="button" class="suggestion" (click)="settingsService.addIgnoredKey(key)">
+                + {{ key }}
+              </button>
+            }
+          </div>
+        }
+      </section>
+
+      <section>
+        <h3>Árvore (Tree Diff)</h3>
+        <div class="options">
+          <label class="radio">
+            <input
+              type="radio"
+              name="treeFilter"
+              [checked]="!settings().showUnchanged"
+              (change)="settingsService.update({ showUnchanged: false })"
+            />
+            <span><strong>Exibir somente diferenças</strong></span>
+          </label>
+          <label class="radio">
+            <input
+              type="radio"
+              name="treeFilter"
+              [checked]="settings().showUnchanged"
+              (change)="settingsService.update({ showUnchanged: true })"
+            />
+            <span><strong>Exibir propriedades inalteradas</strong></span>
+          </label>
+        </div>
+        <div class="row-buttons">
+          <button
+            type="button"
+            class="btn"
+            (click)="store.expandAll()"
+            [disabled]="!store.visibleResult()"
+          >
+            <svg lucideChevronsUpDown></svg> Expandir árvore
+          </button>
+          <button
+            type="button"
+            class="btn"
+            (click)="store.collapseAll()"
+            [disabled]="!store.visibleResult()"
+          >
+            <svg lucideChevronsDownUp></svg> Recolher árvore
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <footer class="drawer-footer">
+      <button type="button" class="btn btn--ghost" (click)="reset()">
+        <svg lucideUndo2></svg> Restaurar padrões
+      </button>
+      <button type="button" class="btn btn--primary" (click)="closed.emit()">Concluído</button>
+    </footer>
+  </aside>
+}

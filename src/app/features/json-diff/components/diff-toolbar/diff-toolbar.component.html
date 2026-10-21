@@ -1,0 +1,63 @@
+<div class="segmented" role="radiogroup" aria-label="Modo de visualização">
+  <button
+    type="button"
+    role="radio"
+    [attr.aria-checked]="viewMode() === 'side-by-side'"
+    [class.selected]="viewMode() === 'side-by-side'"
+    (click)="viewModeChange.emit('side-by-side')"
+  >
+    <svg lucideColumns2></svg>
+    Side by Side
+  </button>
+  <button
+    type="button"
+    role="radio"
+    [attr.aria-checked]="viewMode() === 'tree'"
+    [class.selected]="viewMode() === 'tree'"
+    (click)="viewModeChange.emit('tree')"
+  >
+    <svg lucideListTree></svg>
+    Tree Diff
+  </button>
+</div>
+
+<div class="status" [attr.data-status]="status()" aria-live="polite">
+  @switch (status()) {
+    @case ('ready') {
+      <span class="pulse"></span> Comparação em tempo real
+    }
+    @case ('processing') {
+      <svg lucideLoaderCircle class="spin"></svg> Atualizando comparação…
+    }
+    @case ('invalid') {
+      <span class="pulse"></span> Comparação suspensa: JSON inválido
+    }
+    @default {
+      <span class="pulse"></span> Aguardando os dois documentos
+    }
+  }
+</div>
+
+<div class="nav" role="group" aria-label="Navegação entre diferenças">
+  <button
+    type="button"
+    class="icon-btn"
+    (click)="previous.emit()"
+    [disabled]="!canNavigate()"
+    title="Diferença anterior (Shift+F7)"
+  >
+    <svg lucideChevronUp></svg>
+    <span class="sr-only">Diferença anterior</span>
+  </button>
+  <span class="position" aria-label="Diferença atual">{{ position() }}</span>
+  <button
+    type="button"
+    class="icon-btn"
+    (click)="next.emit()"
+    [disabled]="!canNavigate()"
+    title="Próxima diferença (F7)"
+  >
+    <svg lucideChevronDown></svg>
+    <span class="sr-only">Próxima diferença</span>
+  </button>
+</div>

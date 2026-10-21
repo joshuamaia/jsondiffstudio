@@ -1,0 +1,84 @@
+<div class="filters" role="tablist" aria-label="Filtrar diferenças">
+  @for (option of filters; track option.value) {
+    <button
+      type="button"
+      role="tab"
+      class="filter"
+      [attr.data-kind]="option.value"
+      [class.selected]="filter() === option.value"
+      [attr.aria-selected]="filter() === option.value"
+      (click)="filterChange.emit(option.value)"
+    >
+      {{ option.label }}
+      <span class="count">{{ count(option.value) }}</span>
+    </button>
+  }
+</div>
+
+@if (items().length === 0) {
+  <p class="empty">
+    @if (filter() === 'all') {
+      Nenhuma diferença para exibir.
+    } @else {
+      Nenhuma diferença deste tipo.
+    }
+  </p>
+} @else {
+  <ul class="list" role="list">
+    @for (item of items(); track item.entry.id) {
+      <li>
+        <button
+          type="button"
+          class="item"
+          [attr.data-id]="item.entry.id"
+          [attr.data-kind]="item.entry.kind"
+          [class.active]="item.entry.id === activeId()"
+          (click)="entrySelect.emit(item.entry)"
+          [title]="'Ir para ' + (item.entry.path || '(raiz)') + ' no editor'"
+        >
+          <span class="icon">
+            @switch (item.entry.kind) {
+              @case ('added') {
+                <svg lucideCirclePlus></svg>
+              }
+              @case ('removed') {
+                <svg lucideCircleMinus></svg>
+              }
+              @default {
+                <svg lucidePencil></svg>
+              }
+            }
+          </span>
+          <span class="body">
+            <span class="headline">
+              <span class="badge">{{ labels[item.entry.kind] }}</span>
+              <code class="path">{{ item.entry.path || '(raiz)' }}</code>
+              @if (item.typeChange) {
+                <span class="type-change">tipo: {{ item.typeChange }}</span>
+              }
+            </span>
+            <span class="values">
+              @if (item.oldValue !== null) {
+                <span class="value">
+                  <span class="label">Anterior:</span>
+                  <code class="old">{{ item.oldValue }}</code>
+                </span>
+              }
+              @if (item.newValue !== null) {
+                <span class="value">
+                  <span class="label">Novo:</span>
+                  <code class="new">{{ item.newValue }}</code>
+                </span>
+              }
+            </span>
+          </span>
+        </button>
+      </li>
+    }
+  </ul>
+  @if (hiddenCount() > 0) {
+    <button type="button" class="btn more" (click)="showMore()">
+      Mostrar mais ({{ hiddenCount() }} restantes)
+    </button>
+  }
+}

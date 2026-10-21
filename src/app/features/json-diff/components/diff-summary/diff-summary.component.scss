@@ -1,0 +1,119 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-strong);
+  }
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  transition: opacity 0.2s ease;
+
+  &.stale {
+    opacity: 0.5;
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 8px;
+  border-radius: var(--radius);
+  background: var(--bg);
+  border: 1px solid var(--border);
+
+  strong {
+    font-size: 26px;
+    line-height: 1.1;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+}
+
+.stat--total strong {
+  color: var(--accent);
+}
+.stat--added strong {
+  color: var(--added);
+}
+.stat--modified strong {
+  color: var(--modified);
+}
+.stat--removed strong {
+  color: var(--removed);
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  font-size: 13px;
+  color: var(--text-muted);
+
+  svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+}
+
+.notice--error {
+  color: var(--removed);
+  background: var(--removed-soft);
+  border-color: color-mix(in srgb, var(--removed) 40%, transparent);
+  font-weight: 600;
+}
+
+.notice--success {
+  color: var(--added);
+  background: var(--added-soft);
+  border-color: color-mix(in srgb, var(--added) 40%, transparent);
+  font-weight: 600;
+}
+
+.notice--warning {
+  color: var(--modified);
+  background: var(--modified-soft);
+  border-color: color-mix(in srgb, var(--modified) 35%, transparent);
+}
+
+.notice--muted svg {
+  color: var(--accent);
+}
+
+.ignored {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+@media (max-width: 640px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

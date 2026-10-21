@@ -1,0 +1,129 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px 0 14px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  h1 {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--text-strong);
+  }
+  p {
+    margin: 2px 0 0;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, var(--accent-soft), transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  color: var(--accent);
+
+  svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-btn.bordered {
+  width: 34px;
+  height: 34px;
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.editors {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+}
+
+.app-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 0 20px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-strong);
+  font-weight: 700;
+  white-space: nowrap;
+
+  &[data-status='invalid'] {
+    color: var(--removed);
+    border-color: color-mix(in srgb, var(--removed) 40%, transparent);
+  }
+}
+
+@media (max-width: 1000px) {
+  .editors {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  :host {
+    padding: 0 12px;
+  }
+  .header-actions .label {
+    display: none;
+  }
+  .app-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

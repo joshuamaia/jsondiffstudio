@@ -2,7 +2,8 @@
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": "4793be81-0e4a-4b23-9796-7b8199fb38e8"
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -30,16 +31,19 @@
               }
             ],
             "styles": [
+              {
+                "input": "node_modules/monaco-editor/min/vs/editor/editor.main.css",
+                "bundleName": "monaco-editor",
+                "inject": false
+              },
+              "node_modules/@angular/cdk/overlay-prebuilt.css",
               "src/styles.scss"
             ],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
-            "security": {
-              "allowedHosts": []
+            "loader": {
+              ".css": "empty",
+              ".ttf": "empty"
             },
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            "webWorkerTsConfig": "tsconfig.worker.json"
           },
           "configurations": {
             "production": {
@@ -51,8 +55,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "8kB",
+                  "maximumError": "16kB"
                 }
               ],
               "outputHashing": "all"
@@ -78,7 +82,12 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "setupFiles": [
+              "src/test-setup.ts"
+            ]
+          }
         }
       }
     }

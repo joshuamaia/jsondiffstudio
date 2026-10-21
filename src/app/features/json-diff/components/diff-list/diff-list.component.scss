@@ -1,0 +1,196 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 6px 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-strong);
+    border-color: var(--border-strong);
+  }
+
+  .count {
+    min-width: 22px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &.selected {
+    color: var(--text-strong);
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  &[data-kind='added'].selected {
+    border-color: var(--added);
+    background: var(--added-soft);
+  }
+  &[data-kind='removed'].selected {
+    border-color: var(--removed);
+    background: var(--removed-soft);
+  }
+  &[data-kind='modified'].selected {
+    border-color: var(--modified);
+    background: var(--modified-soft);
+  }
+}
+
+.empty {
+  margin: 4px 0;
+  font-size: 13px;
+  color: var(--text-faint);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  max-height: 420px;
+  overflow: auto;
+  list-style: none;
+}
+
+.item {
+  --kind: var(--accent);
+  --kind-soft: var(--accent-soft);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+
+  &[data-kind='added'] {
+    --kind: var(--added);
+    --kind-soft: var(--added-soft);
+  }
+  &[data-kind='removed'] {
+    --kind: var(--removed);
+    --kind-soft: var(--removed-soft);
+  }
+  &[data-kind='modified'] {
+    --kind: var(--modified);
+    --kind-soft: var(--modified-soft);
+  }
+
+  &:hover {
+    background: var(--surface-2);
+  }
+  &.active {
+    background: var(--kind-soft);
+    border-color: var(--kind);
+  }
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  margin-top: 1px;
+  color: var(--kind);
+  svg {
+    width: 17px;
+    height: 17px;
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.headline {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: var(--kind-soft);
+  color: var(--kind);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.path {
+  font-size: 13px;
+  color: var(--text-strong);
+  word-break: break-all;
+}
+
+.type-change {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 12px;
+}
+
+.value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.label {
+  color: var(--text-faint);
+}
+
+.old,
+.new {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.old {
+  color: var(--removed);
+}
+.new {
+  color: var(--added);
+}
+
+.more {
+  align-self: center;
+}

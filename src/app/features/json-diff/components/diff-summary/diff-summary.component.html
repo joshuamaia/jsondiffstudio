@@ -1,0 +1,83 @@
+<header class="summary-header">
+  <h2>Resultado da comparação</h2>
+  <button
+    type="button"
+    class="btn"
+    (click)="exportReport.emit()"
+    [disabled]="status() !== 'ready' || !stats()"
+    title="Exportar relatório de diferenças em JSON"
+  >
+    <svg lucideFileDown></svg>
+    Exportar relatório
+  </button>
+</header>
+
+@switch (status()) {
+  @case ('invalid') {
+    <div class="notice notice--error" role="alert">
+      <svg lucideCircleX></svg>
+      <span>Comparação indisponível. Corrija o JSON inválido para continuar.</span>
+    </div>
+  }
+  @case ('waiting') {
+    <div class="notice">
+      <svg lucideInfo></svg>
+      <span
+        >Informe o JSON Original e o JSON Modificado — ou carregue um exemplo — para comparar.</span
+      >
+    </div>
+  }
+  @default {
+    @if (stats(); as s) {
+      <div class="cards" [class.stale]="stale()" [attr.aria-busy]="stale()">
+        <div class="stat stat--total">
+          <strong>{{ s.total }}</strong>
+          <span>Total de diferenças</span>
+        </div>
+        <div class="stat stat--added">
+          <strong>{{ s.added }}</strong>
+          <span>{{ s.added === 1 ? 'Adicionada' : 'Adicionadas' }}</span>
+        </div>
+        <div class="stat stat--modified">
+          <strong>{{ s.modified }}</strong>
+          <span>{{ s.modified === 1 ? 'Modificada' : 'Modificadas' }}</span>
+        </div>
+        <div class="stat stat--removed">
+          <strong>{{ s.removed }}</strong>
+          <span>{{ s.removed === 1 ? 'Removida' : 'Removidas' }}</span>
+        </div>
+      </div>
+
+      @if (stale()) {
+        <div class="notice notice--muted">
+          <svg lucideLoaderCircle class="spin"></svg>
+          <span>Atualizando… os valores acima referem-se à versão anterior.</span>
+        </div>
+      } @else if (s.total === 0) {
+        <div class="notice notice--success">
+          <svg lucideCircleCheck></svg>
+          <span>Os documentos JSON são estruturalmente equivalentes.</span>
+        </div>
+      }
+    } @else {
+      <div class="notice notice--muted">
+        <svg lucideLoaderCircle class="spin"></svg>
+        <span>Comparando documentos…</span>
+      </div>
+    }
+
+    @for (warning of warnings(); track warning.message) {
+      <div class="notice notice--warning">
+        <svg lucideTriangleAlert></svg>
+        <span>{{ warning.message }}</span>
+      </div>
+    }
+    @if (ignoredCount() > 0 && !stale()) {
+      <p class="ignored">
+        {{ ignoredCount() }}
+        {{ ignoredCount() === 1 ? 'propriedade ignorada' : 'propriedades ignoradas' }} conforme as
+        configurações.
+      </p>
+    }
+  }
+}

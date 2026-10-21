@@ -1,12 +1,18 @@
-import { Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ThemeService } from './core/services/theme.service';
+import { ToastHostComponent } from './shared/components/toast-host/toast-host.component';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.scss',
-  templateUrl: './app.html',
+  imports: [RouterOutlet, ToastHostComponent],
+  template: `
+    <router-outlet />
+    <app-toast-host />
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  protected readonly title = signal('jsondiffstudio');
+  /** Instancia o serviço de tema na inicialização para aplicar o tema salvo. */
+  protected readonly theme = inject(ThemeService);
 }

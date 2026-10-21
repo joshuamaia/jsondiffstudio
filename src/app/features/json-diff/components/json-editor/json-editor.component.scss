@@ -1,0 +1,129 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 12px 12px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s ease;
+}
+
+:host(.is-invalid) {
+  border-color: color-mix(in srgb, var(--removed) 55%, var(--border));
+}
+
+:host(.is-dragging) {
+  border-color: var(--accent);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-strong);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-faint);
+
+  &[data-status='valid'] {
+    background: var(--added);
+    box-shadow: 0 0 0 3px var(--added-soft);
+  }
+  &[data-status='invalid'] {
+    background: var(--removed);
+    box-shadow: 0 0 0 3px var(--removed-soft);
+  }
+  &[data-status='processing'] {
+    background: var(--accent);
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.divider {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--border);
+}
+
+.format-btn {
+  height: 30px;
+  padding: 0 8px;
+  color: var(--accent);
+}
+
+.editor-frame {
+  position: relative;
+  /* Altura confortável e redimensionável verticalmente. */
+  height: clamp(340px, 58vh, 860px);
+  min-height: 220px;
+  resize: vertical;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--editor-bg);
+}
+
+.editor-host {
+  position: absolute;
+  inset: 0;
+}
+
+.editor-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--editor-bg);
+}
+
+.editor-overlay--drop {
+  background: color-mix(in srgb, var(--accent) 12%, var(--editor-bg));
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.loading {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (max-width: 560px) {
+  .format-btn span {
+    display: none;
+  }
+}

@@ -1,0 +1,57 @@
+<header class="tree-header">
+  <h2>Tree Diff</h2>
+  <div class="legend" aria-hidden="true">
+    <span class="kind-added">+ adicionado</span>
+    <span class="kind-modified">~ alterado</span>
+    <span class="kind-removed">− removido</span>
+  </div>
+  <div class="tools">
+    <label class="switch">
+      <input
+        type="checkbox"
+        [checked]="!showUnchanged()"
+        (change)="showUnchangedChange.emit(!$any($event.target).checked)"
+      />
+      <span class="track"><span class="thumb"></span></span>
+      Somente diferenças
+    </label>
+    <button type="button" class="btn" (click)="expandAll.emit()" [disabled]="!root()">
+      <svg lucideChevronsUpDown></svg>
+      Expandir tudo
+    </button>
+    <button type="button" class="btn" (click)="collapseAll.emit()" [disabled]="!root()">
+      <svg lucideChevronsDownUp></svg>
+      Recolher tudo
+    </button>
+  </div>
+</header>
+
+<div class="tree" role="tree" aria-label="Árvore de diferenças" [class.stale]="stale()">
+  @if (root()) {
+    @for (node of topLevel(); track node.id) {
+      <app-tree-diff-node [node]="node" [depth]="0" />
+    } @empty {
+      <p class="empty">
+        @if (showUnchanged()) {
+          Documento vazio.
+        } @else {
+          Nenhuma diferença — os documentos são estruturalmente equivalentes.
+        }
+      </p>
+    }
+  } @else {
+    <p class="empty">
+      @switch (status()) {
+        @case ('invalid') {
+          Comparação indisponível. Corrija o JSON inválido para continuar.
+        }
+        @case ('waiting') {
+          Informe os dois documentos JSON para visualizar a árvore de diferenças.
+        }
+        @default {
+          Comparando…
+        }
+      }
+    </p>
+  }
+</div>

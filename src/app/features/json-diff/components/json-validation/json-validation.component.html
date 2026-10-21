@@ -1,0 +1,59 @@
+<div class="state">
+  @switch (status()) {
+    @case ('empty') {
+      <span class="indicator indicator--empty">
+        <svg lucideCircleDashed></svg>
+        <span>Aguardando conteúdo</span>
+      </span>
+    }
+    @case ('processing') {
+      <span class="indicator indicator--processing">
+        <svg lucideLoaderCircle class="spin"></svg>
+        <span>Validando…</span>
+      </span>
+    }
+    @case ('valid') {
+      <span class="indicator indicator--valid">
+        <svg lucideCircleCheck></svg>
+        <span>JSON válido</span>
+      </span>
+      @if (autoFormat()) {
+        <span class="hint">· Pretty automático</span>
+      }
+      @if (warnings().length > 0) {
+        <button
+          type="button"
+          class="link link--warning"
+          (click)="locate.emit()"
+          [title]="warnings()[0].message"
+        >
+          <svg lucideTriangleAlert></svg>
+          {{ warnings().length }} {{ warnings().length === 1 ? 'aviso' : 'avisos' }}
+        </button>
+      }
+    }
+    @case ('invalid') {
+      @if (error(); as err) {
+        <span class="indicator indicator--invalid">
+          <svg lucideCircleX></svg>
+          <span>JSON inválido</span>
+        </span>
+        <span class="message" [title]="err.message">— {{ err.message }}</span>
+        <button
+          type="button"
+          class="link link--error"
+          (click)="locate.emit()"
+          title="Ir até o erro no editor"
+        >
+          Linha {{ err.line }}, coluna {{ err.column }}
+        </button>
+      }
+    }
+  }
+</div>
+<div class="meta">
+  <span>{{ lineCount() }} {{ lineCount() === 1 ? 'linha' : 'linhas' }}</span>
+  @if (cursor(); as c) {
+    <span class="cursor">Ln {{ c.line }}, Col {{ c.column }}</span>
+  }
+</div>

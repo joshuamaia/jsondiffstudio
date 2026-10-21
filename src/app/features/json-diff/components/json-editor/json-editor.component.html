@@ -1,0 +1,104 @@
+<header class="panel-header">
+  <h2 class="panel-title">
+    <span class="dot" [attr.data-status]="status()"></span>
+    {{ title() }}
+  </h2>
+  <div class="actions" role="toolbar" [attr.aria-label]="'Ações do ' + title()">
+    <button
+      type="button"
+      class="icon-btn"
+      (click)="openFilePicker()"
+      title="Importar arquivo .json"
+    >
+      <svg lucideFileUp></svg>
+      <span class="sr-only">Importar arquivo</span>
+    </button>
+    <button
+      type="button"
+      class="icon-btn"
+      (click)="exportFile()"
+      [disabled]="isEmpty()"
+      title="Exportar como arquivo .json"
+    >
+      <svg lucideDownload></svg>
+      <span class="sr-only">Exportar arquivo</span>
+    </button>
+    <button
+      type="button"
+      class="icon-btn"
+      (click)="copy()"
+      [disabled]="isEmpty()"
+      title="Copiar JSON formatado"
+    >
+      @if (copied()) {
+        <svg lucideCheck class="kind-added"></svg>
+      } @else {
+        <svg lucideCopy></svg>
+      }
+      <span class="sr-only">Copiar</span>
+    </button>
+    <span class="divider" aria-hidden="true"></span>
+    <button
+      type="button"
+      class="icon-btn"
+      (click)="foldAll()"
+      [disabled]="!ready() || isEmpty()"
+      title="Recolher todos os objetos"
+    >
+      <svg lucideFoldVertical></svg>
+      <span class="sr-only">Recolher tudo</span>
+    </button>
+    <button
+      type="button"
+      class="icon-btn"
+      (click)="unfoldAll()"
+      [disabled]="!ready() || isEmpty()"
+      title="Expandir todos os objetos"
+    >
+      <svg lucideUnfoldVertical></svg>
+      <span class="sr-only">Expandir tudo</span>
+    </button>
+    <button
+      type="button"
+      class="btn btn--ghost format-btn"
+      (click)="formatRequested.emit()"
+      [disabled]="isEmpty()"
+      title="Formatar (Shift+Alt+F)"
+    >
+      <svg lucideWandSparkles></svg>
+      <span>Formatar</span>
+    </button>
+  </div>
+  <input
+    #fileInput
+    type="file"
+    accept=".json,application/json,text/plain"
+    hidden
+    (change)="onFileSelected($event)"
+  />
+</header>
+
+<div class="editor-frame">
+  <div #editorHost class="editor-host"></div>
+  @if (!ready()) {
+    <div class="editor-overlay">
+      @if (loadError(); as message) {
+        <span class="kind-removed">{{ message }}</span>
+      } @else {
+        <span class="loading">Carregando editor…</span>
+      }
+    </div>
+  }
+  @if (dragging()) {
+    <div class="editor-overlay editor-overlay--drop">Solte o arquivo .json para importar</div>
+  }
+</div>
+
+<app-json-validation
+  [status]="status()"
+  [validation]="validation()"
+  [lineCount]="lineCount()"
+  [cursor]="cursor()"
+  [autoFormat]="autoFormat()"
+  (locate)="goToProblem()"
+/>

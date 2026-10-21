@@ -1,0 +1,166 @@
+<header class="app-header">
+  <div class="brand">
+    <span class="logo" aria-hidden="true"><svg lucideBraces></svg></span>
+    <div>
+      <h1>JSON Diff Studio</h1>
+      <p>Compare JSONs de forma inteligente e visual</p>
+    </div>
+  </div>
+
+  <nav class="header-actions" aria-label="Ações principais">
+    <button type="button" class="btn btn--primary" [cdkMenuTriggerFor]="examplesMenu">
+      <svg lucideFlaskConical></svg>
+      <span class="label">Carregar exemplo</span>
+      <svg lucideChevronDown></svg>
+    </button>
+    <button type="button" class="btn" (click)="clear()" [disabled]="!hasContent()">
+      <svg lucideEraser></svg>
+      <span class="label">Limpar</span>
+    </button>
+    <button
+      type="button"
+      class="icon-btn bordered"
+      (click)="theme.toggle()"
+      [title]="theme.theme() === 'dark' ? 'Usar tema claro' : 'Usar tema escuro'"
+    >
+      @if (theme.theme() === 'dark') {
+        <svg lucideSun></svg>
+      } @else {
+        <svg lucideMoon></svg>
+      }
+      <span class="sr-only">Alternar tema</span>
+    </button>
+    <button
+      type="button"
+      class="icon-btn bordered"
+      (click)="settingsOpen.set(true)"
+      title="Configurações"
+      aria-haspopup="dialog"
+    >
+      <svg lucideSettings></svg>
+      <span class="sr-only">Configurações</span>
+    </button>
+  </nav>
+</header>
+
+<ng-template #examplesMenu>
+  <div class="menu" cdkMenu>
+    @for (example of examples; track example.id) {
+      <button
+        type="button"
+        class="menu__item"
+        cdkMenuItem
+        (cdkMenuItemTriggered)="loadExample(example)"
+      >
+        <svg lucideFlaskConical></svg>
+        <span>
+          <strong>{{ example.title }}</strong>
+          <small>{{ example.description }}</small>
+        </span>
+      </button>
+    }
+    <div class="menu__separator" role="separator"></div>
+    <button
+      type="button"
+      class="menu__item menu__item--danger"
+      cdkMenuItem
+      (cdkMenuItemTriggered)="loadExample(invalidExample)"
+    >
+      <svg lucideTriangleAlert></svg>
+      <span>
+        <strong>{{ invalidExample.title }}</strong>
+        <small>{{ invalidExample.description }}</small>
+      </span>
+    </button>
+  </div>
+</ng-template>
+
+<main class="content">
+  <app-diff-toolbar
+    [viewMode]="store.viewMode()"
+    [status]="store.comparisonStatus()"
+    [activeIndex]="store.activeIndex()"
+    [total]="store.filteredEntries().length"
+    (viewModeChange)="store.viewMode.set($event)"
+    (previous)="store.previous()"
+    (next)="store.next()"
+  />
+
+  <!-- Os editores permanecem montados no modo Tree Diff para preservar estado e histórico. -->
+  <section class="editors" [hidden]="store.viewMode() === 'tree'" aria-label="Editores JSON">
+    <app-json-editor
+      side="original"
+      [text]="store.originalText()"
+      [status]="store.originalStatus()"
+      [validation]="store.originalValidation()"
+      [marks]="store.originalMarks()"
+      [focusRequest]="store.originalFocus()"
+      [theme]="theme.theme()"
+      [indent]="settings().indent"
+      [autoFormat]="settings().autoFormatOnPaste"
+      (textChange)="onTextChange('original', $event)"
+      (formatRequested)="onFormat('original')"
+      (fileImported)="onImport('original', $event)"
+    />
+    <app-json-editor
+      side="modified"
+      [text]="store.modifiedText()"
+      [status]="store.modifiedStatus()"
+      [validation]="store.modifiedValidation()"
+      [marks]="store.modifiedMarks()"
+      [focusRequest]="store.modifiedFocus()"
+      [theme]="theme.theme()"
+      [indent]="settings().indent"
+      [autoFormat]="settings().autoFormatOnPaste"
+      (textChange)="onTextChange('modified', $event)"
+      (formatRequested)="onFormat('modified')"
+      (fileImported)="onImport('modified', $event)"
+    />
+  </section>
+
+  @if (store.viewMode() === 'tree') {
+    <app-tree-diff
+      [root]="store.visibleResult()?.root ?? null"
+      [status]="store.comparisonStatus()"
+      [stale]="store.isStale()"
+      [expanded]="store.expanded()"
+      [activeId]="store.activeId()"
+      [showUnchanged]="settings().showUnchanged"
+      (toggle)="store.toggleNode($event)"
+      (locate)="locate($event)"
+      (expandAll)="store.expandAll()"
+      (collapseAll)="store.collapseAll()"
+      (showUnchangedChange)="settingsService.update({ showUnchanged: $event })"
+    />
+  }
+
+  <section class="results card" aria-label="Resultado da comparação">
+    <app-diff-summary
+      [status]="store.comparisonStatus()"
+      [stats]="store.stats()"
+      [stale]="store.isStale()"
+      [warnings]="store.warnings()"
+      [ignoredCount]="store.ignoredCount()"
+      (exportReport)="exportReport()"
+    />
+    @if (store.stats(); as stats) {
+      @if (stats.total > 0) {
+        <app-diff-list
+          [entries]="store.filteredEntries()"
+          [stats]="stats"
+          [filter]="store.filter()"
+          [activeId]="store.activeId()"
+          (filterChange)="store.filter.set($event)"
+          (entrySelect)="store.focus($event, { switchToEditors: true })"
+        />
+      }
+    }
+  </section>
+</main>
+
+<footer class="app-footer">
+  <span>{{ footerSummary() }}</span>
+  <span class="badge" [attr.data-status]="store.comparisonStatus()">{{ footerBadge() }}</span>
+</footer>
+
+<app-diff-settings [open]="settingsOpen()" (closed)="settingsOpen.set(false)" />
